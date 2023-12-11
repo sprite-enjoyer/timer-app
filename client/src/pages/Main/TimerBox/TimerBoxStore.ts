@@ -1,5 +1,5 @@
 import { action, computed, makeObservable, observable } from "mobx";
-import { formatTime } from "../common/utils";
+import { formatTime } from "../../../common/utils";
 
 const DEFAULT_DURATION_MS = 5000;
 

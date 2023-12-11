@@ -1,4 +1,4 @@
-import TimerBox from "../../components/TimerBox/TimerBox";
+import TimerBox from "./TimerBox/TimerBox";
 import styles from "./Main.module.scss";
 
 const Main = () => {
