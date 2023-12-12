@@ -1,6 +1,5 @@
-let interval = null;
-
 // type EventData = { duration: number }; Duration is ms length of timer you want to start
+
 self.onmessage = (event) => {
   switch (event.data.type) {
     case "startTimer":
@@ -9,8 +8,13 @@ self.onmessage = (event) => {
     case "stopTimer":
       handleStopTimer();
       break;
+    case "pauseTimer":
+      handlePauseTimer();
+      break;
   }
 };
+
+function handlePauseTimer() {}
 
 function handleStopTimer() {
   clearInterval(interval);

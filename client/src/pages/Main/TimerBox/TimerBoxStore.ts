@@ -52,7 +52,7 @@ class TimerBoxStore {
 
   pauseTimer() {
     this.isTimerStarted = false;
-    this.worker.postMessage({ type: "stopTimer" });
+    this.worker.postMessage({ type: "pauseTimer" });
   }
 
   onTimerUpdate(event: MessageEvent) {
@@ -62,7 +62,10 @@ class TimerBoxStore {
       this.elapsedTimeSeconds = elapsedTimeSeconds;
       console.log("timer Tick", elapsedTimeSeconds);
     }
+    if (this.elapsedTimeSeconds === 0) this.pauseTimer();
   }
+
+  setupNextSession() {}
 
   initListeners() {
     this.worker.addEventListener("message", (event) => this.onTimerUpdate(event));

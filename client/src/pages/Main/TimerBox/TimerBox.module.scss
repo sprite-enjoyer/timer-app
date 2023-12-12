@@ -1,7 +1,6 @@
-@use "../../styles/mixins" as mixins;
+@use "../../../styles/mixins" as mixins;
 
-
-.container{
+.container {
   height: 400px;
   width: 700px;
   display: flex;
@@ -21,7 +20,7 @@
   font-size: clamp(50px, 15vw, 600px);
 }
 
-.session-number{
+.session-number {
   flex: 1 1;
   display: flex;
   justify-content: center;
@@ -29,7 +28,7 @@
   outline: 2px solid green;
 }
 
-.control-buttons{
+.control-buttons {
   flex: 2 2;
   outline: 2px solid blue;
   display: flex;
@@ -40,5 +39,4 @@
   * {
     @include mixins.button-reset;
   }
-
 }
