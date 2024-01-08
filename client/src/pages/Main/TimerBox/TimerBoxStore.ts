@@ -1,36 +1,34 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { formatTime } from "../../../common/utils";
+import { TimerWorkerMessage, TimerWorkerResponse } from "../../../common/types";
 
-const DEFAULT_DURATION_MS = 5000;
+const DEFAULT_DURATION_SECONDS = 5;
 
 class TimerBoxStore {
   isTimerStarted: boolean = false;
-
-  elapsedTimeSeconds: number;
+  secondsPassed: number = 0;
 
   constructor(
     private readonly worker: Worker,
-    private readonly duration = DEFAULT_DURATION_MS
+    private readonly duration = DEFAULT_DURATION_SECONDS
   ) {
     makeObservable(this, {
       isTimerStarted: observable,
-      elapsedTimeSeconds: observable,
       startTimer: action,
+      secondsPassed: observable,
       onTimerUpdate: action,
       pauseTimer: action,
       elapsedTimeMs: computed,
       elapsedTimeFormatted: computed,
     });
-
-    this.elapsedTimeSeconds = this.duration / 1000;
   }
 
   get elapsedTimeFormatted(): string {
-    return formatTime(this.elapsedTimeSeconds);
+    return formatTime(this.secondsPassed);
   }
 
   get elapsedTimeMs() {
-    return this.elapsedTimeSeconds * 1000;
+    return this.secondsPassed * 1000;
   }
 
   toggleTimer() {
@@ -44,25 +42,24 @@ class TimerBoxStore {
   startTimer() {
     this.isTimerStarted = true;
     console.log("timer started");
-    this.worker.postMessage({
-      type: "startTimer",
-      duration: this.elapsedTimeMs,
-    });
+    const message: TimerWorkerMessage = { type: "start" };
+    this.worker.postMessage(message);
   }
 
   pauseTimer() {
     this.isTimerStarted = false;
-    this.worker.postMessage({ type: "pauseTimer" });
+    const message: TimerWorkerMessage = { type: "stop" };
+    this.worker.postMessage(message);
   }
 
-  onTimerUpdate(event: MessageEvent) {
-    const elapsedTimeSeconds: number = event.data.elapsedTime;
+  onTimerUpdate(event: MessageEvent<TimerWorkerResponse>) {
+    const { secondsPassed } = event.data;
 
-    if (!isNaN(elapsedTimeSeconds)) {
-      this.elapsedTimeSeconds = elapsedTimeSeconds;
-      console.log("timer Tick", elapsedTimeSeconds);
+    if (!isNaN(secondsPassed)) {
+      this.secondsPassed = secondsPassed;
+      console.log("timer Tick", secondsPassed);
     }
-    if (this.elapsedTimeSeconds === 0) this.pauseTimer();
+    if (this.secondsPassed === this.duration) this.pauseTimer();
   }
 
   setupNextSession() {}
