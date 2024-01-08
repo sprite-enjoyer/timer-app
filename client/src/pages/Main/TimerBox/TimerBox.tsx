@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import styles from "./TimerBox.module.scss";
 import TimerBoxStore from "./TimerBoxStore";
 import { observer } from "mobx-react";
+import timerWorkerURL from "../../../workers/Timer.worker?worker&url";
 
 const TimerBox = () => {
   const [timerBoxStore, setTimerBoxStore] = useState<TimerBoxStore>();
 
   useEffect(() => {
-    const worker = new Worker("/Timer.worker.js");
+    const worker = new Worker(timerWorkerURL, { type: "module" });
+
     const store = new TimerBoxStore(worker);
 
     store.initListeners();
