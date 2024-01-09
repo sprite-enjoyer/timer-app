@@ -1,25 +1,31 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import { formatTime } from "../../../common/utils";
 import { TimerWorkerMessage, TimerWorkerResponse } from "../../../common/types";
+import timerWorkerURL from "../../../workers/Timer.worker?worker&url";
 
 const DEFAULT_DURATION_SECONDS = 5;
 
 class TimerBoxStore {
-  isTimerStarted: boolean = false;
+  timerIsStarted: boolean = false;
+  timerIsPaused: boolean = false;
   secondsPassed: number = 0;
+  private readonly duration: number = DEFAULT_DURATION_SECONDS;
+  worker?: Worker;
 
-  constructor(
-    private readonly worker: Worker,
-    private readonly duration = DEFAULT_DURATION_SECONDS
-  ) {
+  constructor(duration: number = DEFAULT_DURATION_SECONDS) {
+    this.duration = duration;
+
     makeObservable(this, {
-      isTimerStarted: observable,
-      startTimer: action,
+      timerIsStarted: observable,
+      timerIsPaused: observable,
       secondsPassed: observable,
+      startTimer: action,
+      discardTimer: action,
       onTimerUpdate: action,
-      pauseTimer: action,
-      elapsedTimeMs: computed,
+      resumeTimer: action,
+      stopTimer: action,
       elapsedTimeFormatted: computed,
+      secondsLeftToCompletion: computed,
     });
   }
 
@@ -27,45 +33,82 @@ class TimerBoxStore {
     return formatTime(this.secondsPassed);
   }
 
-  get elapsedTimeMs() {
-    return this.secondsPassed * 1000;
+  get secondsLeftToCompletion() {
+    return formatTime(this.duration - this.secondsPassed);
   }
 
   toggleTimer() {
-    if (!this.isTimerStarted) {
-      this.startTimer();
-    } else {
-      this.pauseTimer();
+    if (this.timerIsPaused) {
+      this.resumeTimer();
+      return;
     }
+    if (!this.timerIsStarted) {
+      this.startTimer();
+      return;
+    } else this.stopTimer();
   }
 
   startTimer() {
-    this.isTimerStarted = true;
+    this.timerIsPaused = false;
+    this.worker = new Worker(timerWorkerURL, { type: "module" });
+    this.worker.addEventListener("message", (event) => this.onTimerUpdate(event));
+    this.timerIsStarted = true;
     console.log("timer started");
     const message: TimerWorkerMessage = { type: "start" };
     this.worker.postMessage(message);
   }
 
-  pauseTimer() {
-    this.isTimerStarted = false;
+  resumeTimer() {
+    if (!this.timerIsPaused) {
+      console.error("Timer is not paused!");
+      return;
+    }
+    if (!this.worker) {
+      console.error("Worker doens't exist!");
+      return;
+    }
+
+    this.timerIsPaused = false;
+    this.timerIsStarted = true;
+    const message: TimerWorkerMessage = { type: "start" };
+    this.worker?.postMessage(message);
+  }
+
+  stopTimer() {
+    if (this.timerIsPaused) {
+      console.warn("Timer is already paused.");
+    }
+    this.timerIsPaused = true;
+    this.timerIsStarted = false;
+    if (!this.worker) return;
+    this.timerIsStarted = false;
     const message: TimerWorkerMessage = { type: "stop" };
     this.worker.postMessage(message);
   }
 
-  onTimerUpdate(event: MessageEvent<TimerWorkerResponse>) {
-    const { secondsPassed } = event.data;
-
-    if (!isNaN(secondsPassed)) {
-      this.secondsPassed = secondsPassed;
-      console.log("timer Tick", secondsPassed);
-    }
-    if (this.secondsPassed === this.duration) this.pauseTimer();
+  discardTimer() {
+    if (!this.worker) return;
+    this.timerIsStarted = false;
+    this.timerIsPaused = false;
+    this.secondsPassed = 0;
+    const message: TimerWorkerMessage = { type: "discard" };
+    this.worker.postMessage(message);
   }
 
-  setupNextSession() {}
+  onTimerUpdate(event: MessageEvent<TimerWorkerResponse>) {
+    if (!this.timerIsStarted) {
+      console.error("Worker posted a message but the timer is not started!");
+      return;
+    }
+    const { secondsPassed } = event.data;
+    if (secondsPassed === this.secondsPassed) return;
+    this.secondsPassed = secondsPassed;
 
-  initListeners() {
-    this.worker.addEventListener("message", (event) => this.onTimerUpdate(event));
+    console.log("timer Tick", secondsPassed);
+
+    if (this.secondsPassed === this.duration + 1) {
+      this.discardTimer();
+    }
   }
 }
 
