@@ -1,13 +1,14 @@
 import { TimerWorkerMessage, TimerWorkerResponse } from "../common/types";
 
-let intervalID = -1;
 const INTERVAL_MS = 200;
+let intervalID = -1;
+let pausedOn = 0;
+let secondsPassed = 0;
 
-self.onmessage = (event) => {
-  const data = event.data as TimerWorkerMessage;
-  const eventType = data.type;
+self.onmessage = (event: MessageEvent<TimerWorkerMessage>) => {
+  const { type } = event.data;
 
-  switch (eventType) {
+  switch (type) {
     case "start":
       handleStartTimer();
       break;
@@ -24,14 +25,18 @@ const handleStartTimer = () => {
 
   const stepFunc = () => {
     const diff = Date.now() - startTime;
-    const processedDiff = Math.floor(diff / 1000);
-    const response: TimerWorkerResponse = { secondsPassed: processedDiff };
+    const secondsDiff = Math.floor(diff / 1000) + pausedOn;
+    secondsPassed = secondsDiff;
+    const response: TimerWorkerResponse = { secondsPassed: secondsDiff };
     postMessage(response);
   };
 
   intervalID = setInterval(stepFunc, INTERVAL_MS);
 };
 
-const handleStopTimer = () => clearInterval(intervalID);
+const handleStopTimer = () => {
+  clearInterval(intervalID);
+  pausedOn = secondsPassed;
+};
 
 const handleDiscardTimer = () => self.close();
