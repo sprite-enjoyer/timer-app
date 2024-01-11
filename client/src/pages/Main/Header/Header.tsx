@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./Header.module.scss";
 
 const Header = () => {
@@ -11,13 +12,14 @@ const Header = () => {
       <div className={styles["button-group"]}>
         <button
           onClick={handleToggleTheme}
-          className={styles["button-group__toggle-theme"]}
-        >
+          className={styles["button-group__toggle-theme"]}>
           D/N
         </button>
         <button className={styles["button-group__account"]}>acc</button>
         <button className={styles["button-group__stats"]}>stats</button>
-        <button className={styles["button-group__settings"]}>prefp</button>
+        <Link to={"/settings"}>
+          <button className={styles["button-group__settings"]}>prefp</button>
+        </Link>
       </div>
     </div>
   );
