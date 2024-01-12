@@ -1,5 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@200;400;600;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@200;400;600;800&display=swap");
 
+* {
+  min-width: 0;
+}
 
 :root {
   --transition-time: 5s;
@@ -8,7 +11,7 @@
   --primary: #ff5900;
   --secondary: #bbc0a5;
   --accent: #bc19c8;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: "Noto Sans", sans-serif;
 }
 
 .page {

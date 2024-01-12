@@ -1,0 +1,19 @@
+@mixin settingStandard($flexDirection: row) {
+  display: flex;
+  flex-direction: $flexDirection;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.setting-standard {
+  @include settingStandard();
+}
+
+.setting-vertical {
+  @include settingStandard(column);
+}
+
+.container {
+  padding: 20px max(50px, 5vw);
+}

@@ -13,7 +13,7 @@ const AccordionItem = ({ title, children }: AccordionItemProps) => {
   return (
     <div className={styles.container}>
       <div className={styles["title-box"]}>
-        <button onClick={handleClick}>svg here</button>
+        <button onClick={handleClick}>V</button>
         <span>{title}</span>
       </div>
       {showContent && children}
