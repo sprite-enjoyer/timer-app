@@ -1,5 +1,5 @@
-import Accordion from "./Accordion/Accordion";
-import AccordionItem from "./AccordionItem/AccordionItem";
+import Accordion from "../../components/Accordion/Accordion";
+import AccordionItem from "../../components/AccordionItem/AccordionItem";
 import styles from "./Settings.module.scss";
 import Switch from "../../components/Switch/Switch";
 import SelectionGrid from "../../components/SelectionGrid/SelectionGrid";
