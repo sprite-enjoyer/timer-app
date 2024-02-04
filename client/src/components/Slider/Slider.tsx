@@ -1,7 +1,10 @@
 import { ChangeEvent, useState } from "react";
 
 export interface SliderProps {
-  inputProps?: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+  inputProps?: React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  >;
 }
 
 const Slider = ({ inputProps }: SliderProps) => {
@@ -20,7 +23,8 @@ const Slider = ({ inputProps }: SliderProps) => {
         value={sliderValue}
         onChange={handleSliderChange}
         id="slider"
-        type="range"></input>
+        type="range"
+      ></input>
     </label>
   );
 };

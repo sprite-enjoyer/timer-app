@@ -51,9 +51,10 @@ class TimerBoxStore {
   startTimer() {
     this.timerIsPaused = false;
     this.worker = new Worker(timerWorkerURL, { type: "module" });
-    this.worker.addEventListener("message", (event) => this.onTimerUpdate(event));
+    this.worker.addEventListener("message", (event) =>
+      this.onTimerUpdate(event)
+    );
     this.timerIsStarted = true;
-    console.log("timer started");
     const message: TimerWorkerMessage = { type: "start" };
     this.worker.postMessage(message);
   }
@@ -103,8 +104,6 @@ class TimerBoxStore {
     const { secondsPassed } = event.data;
     if (secondsPassed === this.secondsPassed) return;
     this.secondsPassed = secondsPassed;
-
-    console.log("timer Tick", secondsPassed);
 
     if (this.secondsPassed === this.duration + 1) {
       this.discardTimer();

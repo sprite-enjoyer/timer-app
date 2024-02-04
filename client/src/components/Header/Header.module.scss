@@ -1,4 +1,4 @@
-@use "../../../styles/mixins" as mixins;
+@use "../../styles/mixins" as mixins;
 
 .container {
   box-sizing: border-box;
@@ -47,4 +47,11 @@
     border: 2px solid gray;
     color: var(--text);
   }
+}
+
+.dropdown {
+  position: absolute;
+  top: 70px;
+  right: 200px;
+  outline: 2px solid black;
 }

@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import styles from "./Accordion.module.scss";
 
 export interface AccordionProps {
-  children: ReactElement[];
+  children: ReactNode;
 }
 
 const Accordion = ({ children }: AccordionProps) => {
